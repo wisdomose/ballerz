@@ -6,3 +6,28 @@ export const firebaseConfig = {
   messagingSenderId: process.env.NEXT_PUBLIC_messagingSenderId,
   appId: process.env.NEXT_PUBLIC_appId,
 };
+
+export const statKeyMap = {
+  pointsPerGame: "Points per Game",
+  fieldGoalPercentage: "Field Goal Percentage",
+  threePointPercentage: "Three-Point Percentage",
+  freeThrowPercentage: "Free Throw Percentage",
+  reboundsPerGame: "Rebounds per Game",
+  offensiveReboundsPerGame: "Offensive Rebounds per Game",
+  defensiveReboundsPerGame: "Defensive Rebounds per Game",
+  assistsPerGame: "Assists per Game",
+  stealsPerGame: "Steals per Game",
+  blocksPerGame: "Blocks per Game",
+  turnoversPerGame: "Turnovers per Game",
+  playerEfficiencyRating: "Player Efficiency Rating",
+  plusMinus: "Plus/Minus",
+  minutesPerGame: "Minutes per Game",
+  usageRate: "Usage Rate",
+  trueShootingPercentage: "True Shooting Percentage",
+  effectiveFieldGoalPercentage: "Effective Field Goal Percentage",
+  winShares: "Win Shares",
+  offensiveRating: "Offensive Rating",
+  defensiveRating: "Defensive Rating",
+  assistToTurnoverRatio: "Assist-to-Turnover Ratio",
+  foulsPerGame: "Fouls per Game",
+};

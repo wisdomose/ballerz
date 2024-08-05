@@ -19,6 +19,7 @@ export enum LEVEL {
 
 export type Player = {
   id: string;
+  coach: Coach;
   displayName: string;
   dob: Timestamp;
   address: Address;

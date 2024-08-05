@@ -24,8 +24,8 @@ import {
 } from "@/components/ui/popover";
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
-import useFetcher from "@/hooks/useFetcher";
 import { useForm } from "react-hook-form";
+import useFetcher from "@/hooks/useFetcher";
 import { Timestamp } from "firebase/firestore";
 import { useEffect } from "react";
 import { toast } from "react-toastify";
@@ -33,6 +33,7 @@ import { Button } from "./ui/button";
 import { FiCalendar, FiPlus } from "react-icons/fi";
 import moment from "moment";
 import { cn } from "@/lib/utils";
+import EventService from "@/services/Event";
 
 const formSchema = z.object({
   name: z
@@ -55,19 +56,19 @@ export default function AddEvent() {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    // const userService = new UserService();
-    // await wrapper(() =>
-    //   userService.signUp({
-    //     name: values.name,
-    //     startingAt: Timestamp.fromDate(values.startingAt),
-    //   })
-    // );
+    const eventService = new EventService();
+    await wrapper(() =>
+      eventService.create({
+        name: values.name,
+        startingAt: Timestamp.fromDate(values.startingAt),
+      })
+    );
   }
 
   useEffect(() => {
     if (data) {
-      //   setUser(data);
-      window.location.href = "/";
+      toast.success("Event created");
+      form.reset();
     }
   }, [data]);
 
@@ -77,7 +78,7 @@ export default function AddEvent() {
 
   return (
     <Dialog>
-      <DialogTrigger className="w-full">
+      <DialogTrigger asChild className="w-full">
         <Button variant="outline" className="mb-2 w-full">
           <FiPlus className="mr-2" />
           <span>Add a new event</span>
@@ -150,6 +151,10 @@ export default function AddEvent() {
                 </FormItem>
               )}
             />
+
+            <Button type="submit" className="mt-3" loading={loading}>
+              Create Event
+            </Button>
           </form>
         </Form>
       </DialogContent>

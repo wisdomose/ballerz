@@ -5,6 +5,8 @@ export type Stats = {
   id: string;
   owner: Player;
   timestamp: Timestamp;
+  updatedAt: Timestamp;
+  remark: string;
   pointsPerGame: number; // Points per game (PPG)
   fieldGoalPercentage: number; // Field goal percentage (FG%)
   threePointPercentage: number; // Three-point percentage (3P%)

@@ -1,5 +1,6 @@
 "use client";
 
+import Spinner from "@/components/Spinner";
 import { firebaseConfig } from "@/lib";
 import { initializeApp } from "firebase/app";
 import { connectAuthEmulator, getAuth } from "firebase/auth";
@@ -31,6 +32,11 @@ export default function FirebaseInit({
     setInit(true);
   }, []);
 
-  if (!init) return null;
+  if (!init)
+    return (
+      <div className="fixed inset-0 flex flex-col items-center justify-center gap-5">
+        <Spinner />
+      </div>
+    );
   return <>{children}</>;
 }

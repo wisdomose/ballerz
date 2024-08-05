@@ -46,13 +46,13 @@ export default function Login() {
         password: values.password,
       })
     );
-    console.log(values);
   }
 
   useEffect(() => {
     if (data) {
       setUser(data);
-      window.location.href = "/";
+      window.location.href = "/feed";
+      toast.success("Login sucessful. You will be rediredcted shortly");
     }
   }, [data]);
 
@@ -103,7 +103,7 @@ export default function Login() {
           )}
         />
 
-        <Button type="submit" className="mt-3">
+        <Button type="submit" className="mt-3" loading={loading}>
           Login
         </Button>
       </form>

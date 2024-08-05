@@ -38,32 +38,60 @@ import { Calendar } from "@/components/ui/calendar";
 import moment from "moment";
 import { cn } from "@/lib/utils";
 
+// const formSchema = z.object({
+//   lastname: z
+//     .string({ required_error: "Last name is required" })
+//     .min(2, "Lastname is too short"),
+//   firstname: z
+//     .string({ required_error: "First name is required" })
+//     .min(2, "Firstname is too short"),
+//   dob: z
+//     .string({ required_error: "Date of birth is required" })
+//     .min(2, "Date of birth is required"),
+//   gender: z.enum(["male", "female"], { required_error: "Gender is required" }),
+//   role: z.enum(["PLAYER", "COACH"], {
+//     invalid_type_error: "Invalid user role",
+//   }),
+//   position: z.number().min(1, "Position cannot be less than 1"),
+//   level: z.enum(["BEGINNER", "MODERATE", "PROFESSIONAL"], {
+//     invalid_type_error: "Invalid level",
+//   }),
+//   email: z.string({ required_error: "Email is required" }).email(),
+//   password: z
+//     .string({ required_error: "Password is required" })
+//     .min(6, "Password should be at least 6 characters"),
+
+//   // address
+//   country: z.string({ required_error: "Country of residence is required" }),
+//   state: z.string({ required_error: "State of residence is required" }),
+//   city: z.string({ required_error: "City of residence is required" }),
+//   street: z.string({ required_error: "Name of your street is required" }),
+//   houseNo: z
+//     .number({ required_error: "House number is required" })
+//     .min(1, "Invalid house address"),
+// });
 const formSchema = z.object({
   lastname: z
-    .string({ required_error: "Last name is required" })
-    .min(2, "Lastname is too short"),
+    .string({ required_error: "Your lastname is required" })
+    .min(2, "Your lastname is too short"),
   firstname: z
-    .string({ required_error: "First name is required" })
-    .min(2, "Firstname is too short"),
+    .string({ required_error: "Your firstname is required" })
+    .min(2, "Your firstname is too short"),
   dob: z
-    .date({ required_error: "Date of birth is required" })
-    .min(
-      new Date("01/01/2014"),
-      "You need to be above 10 years to use this platform"
-    ),
+    .string({ required_error: "Date of birth is required" })
+    .min(2, "Date of birth is required"),
   gender: z.enum(["male", "female"], { required_error: "Gender is required" }),
   role: z.enum(["PLAYER", "COACH"], {
     invalid_type_error: "Invalid user role",
   }),
-  position: z.number().min(1, "Position cannot be less than 1"),
+  position: z.number().min(1, "Position cannot be less than 1").optional(),
   level: z.enum(["BEGINNER", "MODERATE", "PROFESSIONAL"], {
     invalid_type_error: "Invalid level",
-  }),
+  }).optional(),
   email: z.string({ required_error: "Email is required" }).email(),
   password: z
     .string({ required_error: "Password is required" })
     .min(6, "Password should be at least 6 characters"),
-
   // address
   country: z.string({ required_error: "Country of residence is required" }),
   state: z.string({ required_error: "State of residence is required" }),
@@ -82,13 +110,15 @@ export default function Signup() {
     defaultValues: {
       lastname: "",
       firstname: "",
-      dob: undefined,
+      dob: "",
       gender: "male",
       role: ROLES.PLAYER,
       position: undefined,
       level: undefined,
       email: "",
       password: "",
+
+      // address
       country: "",
       state: "",
       city: "",
@@ -102,7 +132,7 @@ export default function Signup() {
     await wrapper(() =>
       userService.signUp({
         displayName: `${values.lastname} ${values.firstname}`,
-        dob: Timestamp.fromDate(values.dob),
+        dob: Timestamp.fromDate(new Date(values.dob)),
         address: {
           country: values.country,
           state: values.state,
@@ -124,12 +154,14 @@ export default function Signup() {
     if (data) {
       setUser(data);
       window.location.href = "/";
+      toast.success("Signup sucessful");
     }
   }, [data]);
 
   useEffect(() => {
     if (error) toast.error(error);
   }, [error]);
+
   return (
     <Form {...form}>
       <form
@@ -194,43 +226,29 @@ export default function Signup() {
             </FormItem>
           )}
         />
+
         <div className="grid grid-cols-2 items-center gap-6">
           {/* dob */}
           <FormField
             control={form.control}
             name="dob"
             render={({ field }) => (
-              <FormItem className="flex flex-col">
-                <FormLabel className="mb-2">Date of birth</FormLabel>
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <FormControl>
-                      <Button
-                        variant={"outline"}
-                        className={cn(!field.value && "text-muted-foreground")}
-                      >
-                        {field.value ? (
-                          moment(field.value).format("DD/MM/YYYY")
-                        ) : (
-                          <span>Pick a date</span>
-                        )}
-                        <FiCalendar className="ml-auto h-4 w-4 opacity-50" />
-                      </Button>
-                    </FormControl>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={field.value}
-                      onSelect={field.onChange}
-                      disabled={(date) =>
-                        date > new Date() || date < new Date("1900-01-01")
-                      }
-                      initialFocus
-                    />
-                  </PopoverContent>
-                </Popover>
-                <FormMessage />
+              <FormItem>
+                <FormLabel>Date of birth</FormLabel>
+                <FormControl>
+                  <Input
+                    {...field}
+                    type="date"
+                    value={field.value}
+                    onChange={(e) => field.onChange(e.target.value)}
+                    placeholder=""
+                  />
+                </FormControl>
+                {form.formState.errors["dob"]?.message && (
+                  <FormMessage>
+                    {form.formState.errors["dob"]?.message}
+                  </FormMessage>
+                )}
               </FormItem>
             )}
           />
@@ -294,9 +312,9 @@ export default function Signup() {
             </FormItem>
           )}
         />
+
         {/* position */}
         {/* level */}
-
         {form.getValues().role === ROLES.PLAYER && (
           <div className="grid grid-cols-2 gap-6">
             <FormField
@@ -310,6 +328,7 @@ export default function Signup() {
                       {...field}
                       type="number"
                       min={1}
+                      value={field.value ?? ""}
                       onChange={(e) =>
                         field.onChange(e.currentTarget.valueAsNumber)
                       }
@@ -379,7 +398,110 @@ export default function Signup() {
           )}
         />
 
-        <Button type="submit" className="mt-3">
+        {/* address */}
+        <p className="font-semibold mt-4">Address information</p>
+        <div className="grid grid-cols-2 items-center gap-6">
+          {/* country */}
+          <FormField
+            control={form.control}
+            name="country"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Country</FormLabel>
+                <FormControl>
+                  <Input placeholder="Nigeria" {...field} />
+                </FormControl>
+                {form.formState.errors["country"]?.message && (
+                  <FormMessage>
+                    {form.formState.errors["country"]?.message}
+                  </FormMessage>
+                )}
+              </FormItem>
+            )}
+          />
+          {/* state */}
+          <FormField
+            control={form.control}
+            name="state"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>State</FormLabel>
+                <FormControl>
+                  <Input placeholder="Cross River" {...field} />
+                </FormControl>
+                {form.formState.errors["state"]?.message && (
+                  <FormMessage>
+                    {form.formState.errors["state"]?.message}
+                  </FormMessage>
+                )}
+              </FormItem>
+            )}
+          />
+        </div>
+
+        {/* city */}
+        {/* street */}
+        <div className="grid grid-cols-2 items-center gap-6">
+          <FormField
+            control={form.control}
+            name="city"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>City</FormLabel>
+                <FormControl>
+                  <Input placeholder="Calabar" {...field} />
+                </FormControl>
+                {form.formState.errors["city"]?.message && (
+                  <FormMessage>
+                    {form.formState.errors["city"]?.message}
+                  </FormMessage>
+                )}
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="street"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Street</FormLabel>
+                <FormControl>
+                  <Input placeholder="Nigeria" {...field} />
+                </FormControl>
+                {form.formState.errors["street"]?.message && (
+                  <FormMessage>
+                    {form.formState.errors["street"]?.message}
+                  </FormMessage>
+                )}
+              </FormItem>
+            )}
+          />
+        </div>
+        {/* house no */}
+        <FormField
+          control={form.control}
+          name="houseNo"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Number</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="Nigeria"
+                  type="number"
+                  {...field}
+                  onChange={(e) => field.onChange(e.target.valueAsNumber)}
+                />
+              </FormControl>
+              {form.formState.errors["houseNo"]?.message && (
+                <FormMessage>
+                  {form.formState.errors["houseNo"]?.message}
+                </FormMessage>
+              )}
+            </FormItem>
+          )}
+        />
+
+        <Button type="submit" className="mt-3" loading={loading}>
           Signup
         </Button>
       </form>

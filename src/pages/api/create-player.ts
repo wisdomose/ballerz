@@ -91,7 +91,7 @@ export default async function handler(
 
     await setDoc(doc(db, COLLECTIONS.USERS, data.id), data);
 
-    res.status(200).json(doc);
+    return res.status(200).json(data);
   } catch (error: any) {
     res.status(400).send(error?.response?.data ?? error.message);
   }

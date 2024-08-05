@@ -4,6 +4,7 @@ import { getApp } from "firebase/app";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import {
   collection,
+  getDoc,
   getDocs,
   getFirestore,
   query,
@@ -54,12 +55,12 @@ export default class UserService {
 
   async signUp(
     params: Omit<
-      Player &
-        Coach & {
-          password: string;
-        },
-      "id" | "timestamp" | "photoURL"
-    >
+      Player & Coach,
+      "id" | "timestamp" | "photoURL" | "coach" | "position"
+    > & {
+      password: string;
+      position?: number;
+    }
   ) {
     return new Promise<SignUpResponse>(async (resolve, reject) => {
       try {
@@ -74,6 +75,7 @@ export default class UserService {
           method: "POST",
           data: params,
         });
+
         resolve(result.data);
       } catch (error: any) {
         reject(error?.response?.data ?? error.message);
@@ -95,10 +97,16 @@ export default class UserService {
 
         if (!querySnapshot.empty) {
           const doc = querySnapshot.docs[0];
-          const profile = {
-            id: doc.id,
+          let profile = {
             ...doc.data(),
-          };
+          } as User;
+
+          if (profile.role === ROLES.PLAYER && (profile as Player).coach) {
+            // @ts-ignore
+            const coach = await getDoc(profile.coach);
+            if (coach.exists())
+              (profile as Player).coach = coach.data() as Coach;
+          }
 
           resolve(profile as unknown as User);
         }

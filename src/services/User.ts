@@ -10,9 +10,11 @@ import {
   getDocs,
   getFirestore,
   query,
+  updateDoc,
   where,
 } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
+import TeamService from "./Team";
 
 export type LoginResponse = User;
 export type SignUpResponse = User;
@@ -133,6 +135,22 @@ export default class UserService {
         });
 
         await deleteDoc(userRef);
+
+        // remove coach value from users who are in the team of the coach
+        const teamService = new TeamService();
+        const players = await teamService.team(id);
+
+        const promises = players.map((player) => {
+          return new Promise((res, rej) => {
+            updateDoc(doc(this.db, COLLECTIONS.USERS, player.id), {
+              coach: "",
+            });
+
+            res(true);
+          });
+        });
+
+        await Promise.all(promises);
 
         resolve(true);
       } catch (error: any) {

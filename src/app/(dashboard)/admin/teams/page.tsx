@@ -12,10 +12,10 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import useFetcher from "@/hooks/useFetcher";
-import PlayerService from "@/services/Player";
+import TeamService from "@/services/Team";
 import UserService from "@/services/User";
 import { useUserStore } from "@/store/user";
-import { Player, ROLES } from "@/types";
+import { Coach, ROLES } from "@/types";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { FiTrash } from "react-icons/fi";
@@ -24,11 +24,11 @@ import { toast } from "react-toastify";
 export default function UsersPage() {
   const user = useUserStore((s) => s.user);
 
-  const [team, setTeam] = useState<Player[]>([]);
-  const { data, wrapper, loading } = useFetcher<Player[]>();
+  const [coaches, setCoaches] = useState<Coach[]>([]);
+  const { data, wrapper, loading } = useFetcher<Coach[]>();
 
   useEffect(() => {
-    const teamService = new PlayerService();
+    const teamService = new TeamService();
     wrapper(teamService.findAll);
 
     const interval = setInterval(async () => {
@@ -42,7 +42,7 @@ export default function UsersPage() {
 
   useEffect(() => {
     if (data) {
-      setTeam(data);
+      setCoaches(data);
     }
   }, [data]);
 
@@ -50,11 +50,9 @@ export default function UsersPage() {
     <main className="max-w-7xl mx-auto">
       <NavBar />
 
-      {team.length === 0 && !loading ? (
-        <p className="text-center text-xs text-gray-500 mt-6">
-          No players found
-        </p>
-      ) : team.length === 0 && loading ? (
+      {coaches.length === 0 && !loading ? (
+        <p className="text-center text-xs text-gray-500 mt-6">No teams found</p>
+      ) : coaches.length === 0 && loading ? (
         <div className="flex items-center justify-center mt-6">
           <Spinner />
         </div>
@@ -64,32 +62,29 @@ export default function UsersPage() {
             <TableHeader>
               <TableRow>
                 <TableHead></TableHead>
-                <TableHead>Name</TableHead>
+                <TableHead>Coach</TableHead>
                 <TableHead className="whitespace-nowrap">Email</TableHead>
                 <TableHead className="whitespace-nowrap">Gender</TableHead>
-                <TableHead className="whitespace-nowrap">Position</TableHead>
-                <TableHead className="whitespace-nowrap">Level</TableHead>
-                <TableHead className="whitespace-nowrap">Coach</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {team.map((player) => (
-                <TableRow key={player.id}>
+              {coaches.map((coach) => (
+                <TableRow key={coach.id}>
                   <TableCell>
-                    <DeletePlayer id={player.id} />
+                    <DeleteCoach id={coach.id} />
                   </TableCell>
                   <TableCell className="whitespace-nowrap">
                     <Button asChild variant="link" className="px-0 py-1">
-                      <Link href={`/${player.id}`} className="capitalize">
-                        {player.displayName}
+                      <Link
+                        href={`/admin/teams/${coach.id}`}
+                        className="capitalize"
+                      >
+                        {coach.displayName}
                       </Link>
                     </Button>
                   </TableCell>
-                  <TableCell>{player.email}</TableCell>
-                  <TableCell>{player.gender}</TableCell>
-                  <TableCell>{player.position}</TableCell>
-                  <TableCell>{player.level}</TableCell>
-                  <TableCell>{player?.coach?.displayName ?? "-"}</TableCell>
+                  <TableCell>{coach.email}</TableCell>
+                  <TableCell>{coach.gender}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -103,7 +98,7 @@ export default function UsersPage() {
   );
 }
 
-function DeletePlayer({ id }: { id: string }) {
+function DeleteCoach({ id }: { id: string }) {
   const { data, wrapper, loading } = useFetcher<boolean>();
   const user = useUserStore((s) => s.user);
 
@@ -113,7 +108,7 @@ function DeletePlayer({ id }: { id: string }) {
   }
 
   useEffect(() => {
-    if (data) toast.success("User deleted");
+    if (data) toast.success("Team deleted");
   }, [data]);
 
   return (

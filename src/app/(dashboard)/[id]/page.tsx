@@ -1,8 +1,4 @@
 "use client";
-import { stats } from "@/mocks/stats";
-import Logout from "@/components/Logout";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
@@ -11,20 +7,18 @@ import moment from "moment";
 import {
   Sheet,
   SheetContent,
-  SheetDescription,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { users } from "@/mocks/users";
 import { useParams } from "next/navigation";
 import NavBar from "@/components/NavBar";
 import { useUserStore } from "@/store/user";
 import { useEffect, useMemo, useState } from "react";
 import UserService from "@/services/User";
 import useFetcher from "@/hooks/useFetcher";
-import { Player, Stats, User } from "@/types";
+import { Player, Stats } from "@/types";
 import Spinner from "@/components/Spinner";
 import StatsService from "@/services/Stat";
 
@@ -144,10 +138,16 @@ export default function StatPage() {
                     <SheetTitle>Performance history</SheetTitle>
                   </SheetHeader>
 
-                  {historyFetcher.data.length === 0 ? (
-                    <p className="text-xs text-center text-gray-500 py-4">
+                  {historyFetcher.data.length === 0 &&
+                  !historyFetcher.loading ? (
+                    <p className="text-center text-xs text-gray-500 mt-6">
                       This user has no statistics
                     </p>
+                  ) : historyFetcher.data.length === 0 &&
+                    historyFetcher.loading ? (
+                    <div className="flex items-center justify-center mt-6">
+                      <Spinner />
+                    </div>
                   ) : (
                     <ScrollArea className="mt-6 h-[85vh] pr-3">
                       {historyFetcher.data.map((entry) => {
@@ -237,7 +237,9 @@ export default function StatPage() {
           {stat?.remark && (
             <div className="py-2 max-w-lg mt-6">
               <p className="text-sm font-medium mb-2">Remark</p>
-              <p className="text-gray-600 border rounded-md py-3 px-3">{stat.remark}</p>
+              <p className="text-gray-600 border rounded-md py-3 px-3">
+                {stat.remark}
+              </p>
             </div>
           )}
         </div>

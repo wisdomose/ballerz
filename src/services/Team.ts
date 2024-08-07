@@ -1,4 +1,4 @@
-import { COLLECTIONS, Player, ROLES, Stats } from "@/types";
+import { Coach, COLLECTIONS, Player, ROLES, Stats } from "@/types";
 import { getApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import {
@@ -31,9 +31,10 @@ export default class TeamService {
     this.team = this.team.bind(this);
     this.overview = this.overview.bind(this);
     this.count = this.count.bind(this);
+    this.findAll = this.findAll.bind(this);
   }
 
-  async team() {
+  async team(id?: string) {
     return new Promise<Player[]>(async (resolve, reject) => {
       try {
         if (!this.auth.currentUser) throw new Error("You need to be logged in");
@@ -42,7 +43,7 @@ export default class TeamService {
         const userRef = doc(
           this.db,
           COLLECTIONS.USERS,
-          this.auth.currentUser.uid
+          id ?? this.auth.currentUser.uid
         );
 
         const usersCol = collection(this.db, COLLECTIONS.USERS);
@@ -71,11 +72,11 @@ export default class TeamService {
     });
   }
 
-  async overview() {
+  async overview(id?: string) {
     return new Promise<TeamOverview>(async (resolve, reject) => {
       try {
         if (!this.auth.currentUser) throw new Error("You need to be logged in");
-        const team = await this.team();
+        const team = await this.team(id);
 
         let promises: Promise<TeamOverview[number] | null>[] = [];
         team.forEach((player) => {
@@ -114,6 +115,41 @@ export default class TeamService {
         const querySnapshot = await getCountFromServer(q);
 
         resolve(querySnapshot.data().count);
+      } catch (error: any) {
+        reject(error?.response?.data ?? error.message);
+      }
+    });
+  }
+
+  async findAll() {
+    return new Promise<Coach[]>(async (resolve, reject) => {
+      try {
+        if (!this.auth.currentUser) throw new Error("You need to be logged in");
+        const userService = new UserService();
+
+        const usersCol = collection(this.db, COLLECTIONS.USERS);
+        let q = query(usersCol, where("role", "==", ROLES.COACH));
+        const querySnapshot = await getDocs(q);
+
+        let promises: Promise<Coach | null>[] = [];
+        querySnapshot.forEach((doc) => {
+          promises.push(
+            new Promise(async (res, rej) => {
+              try {
+                const coach = (await userService.profile(doc.id)) as Coach;
+                res(coach);
+              } catch (error) {
+                res(null);
+              }
+            })
+          );
+        });
+
+        const coaches = (await Promise.all(promises)).filter(
+          (team) => team !== null
+        );
+
+        resolve(coaches);
       } catch (error: any) {
         reject(error?.response?.data ?? error.message);
       }

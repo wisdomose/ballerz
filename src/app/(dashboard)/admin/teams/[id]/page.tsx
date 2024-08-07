@@ -86,70 +86,87 @@ export default function TeamPage() {
           <Spinner />
         </div>
       ) : (
-        <ScrollArea className="w-full px-3 md:px-6 py-3 mt-6">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Player</TableHead>
-                <TableHead className="whitespace-nowrap">
-                  {keyMap["pointsPerGame"]}
-                </TableHead>
-                <TableHead className="whitespace-nowrap">
-                  {keyMap["assistsPerGame"]}
-                </TableHead>
-                <TableHead className="whitespace-nowrap">
-                  {keyMap["reboundsPerGame"]}
-                </TableHead>
-                <TableHead className="whitespace-nowrap">
-                  {keyMap["turnoversPerGame"]}
-                </TableHead>
-                <TableHead className="whitespace-nowrap">
-                  {keyMap["stealsPerGame"]}
-                </TableHead>
-                <TableHead className="whitespace-nowrap">
-                  {keyMap["blocksPerGame"]}
-                </TableHead>
-                <TableHead className="whitespace-nowrap">
-                  {keyMap["foulsPerGame"]}
-                </TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {team
-                //   .filter((user) => user.role === ROLES["PLAYER"])
-                .map((user) => (
-                  <TableRow key={user.player.id}>
-                    <TableCell className="whitespace-nowrap">
-                      <Button asChild variant="link" className="px-0 py-1">
-                        <Link
-                          href={`/${user.player.id}`}
-                          className="capitalize"
-                        >
-                          {user.player.displayName}
-                        </Link>
-                      </Button>
-                    </TableCell>
-                    <TableCell>{user.stats[0]?.pointsPerGame ?? "-"}</TableCell>
-                    <TableCell>
-                      {user.stats[0]?.assistsPerGame ?? "-"}
-                    </TableCell>
-                    <TableCell>
-                      {user.stats[0]?.reboundsPerGame ?? "-"}
-                    </TableCell>
-                    <TableCell>
-                      {user.stats[0]?.turnoversPerGame ?? "-"}
-                    </TableCell>
-                    <TableCell>{user.stats[0]?.stealsPerGame ?? "-"}</TableCell>
-                    <TableCell>{user.stats[0]?.blocksPerGame ?? "-"}</TableCell>
-                    <TableCell>{user.stats[0]?.foulsPerGame ?? "-"}</TableCell>
-                  </TableRow>
-                ))}
-            </TableBody>
-          </Table>
+        <>
+          <h1 className="mt-6 px-3 md:px-6">
+            Coach{" "}
+            <span className="capitalize font-medium">
+              {team[0]?.player?.coach?.displayName}
+            </span>
+            `s team
+          </h1>
+          <ScrollArea className="w-full px-3 md:px-6 py-3 mt-6">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Player</TableHead>
+                  <TableHead className="whitespace-nowrap">
+                    {keyMap["pointsPerGame"]}
+                  </TableHead>
+                  <TableHead className="whitespace-nowrap">
+                    {keyMap["assistsPerGame"]}
+                  </TableHead>
+                  <TableHead className="whitespace-nowrap">
+                    {keyMap["reboundsPerGame"]}
+                  </TableHead>
+                  <TableHead className="whitespace-nowrap">
+                    {keyMap["turnoversPerGame"]}
+                  </TableHead>
+                  <TableHead className="whitespace-nowrap">
+                    {keyMap["stealsPerGame"]}
+                  </TableHead>
+                  <TableHead className="whitespace-nowrap">
+                    {keyMap["blocksPerGame"]}
+                  </TableHead>
+                  <TableHead className="whitespace-nowrap">
+                    {keyMap["foulsPerGame"]}
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {team
+                  //   .filter((user) => user.role === ROLES["PLAYER"])
+                  .map((user) => (
+                    <TableRow key={user.player.id}>
+                      <TableCell className="whitespace-nowrap">
+                        <Button asChild variant="link" className="px-0 py-1">
+                          <Link
+                            href={`/${user.player.id}`}
+                            className="capitalize"
+                          >
+                            {user.player.displayName}
+                          </Link>
+                        </Button>
+                      </TableCell>
+                      <TableCell>
+                        {user.stats[0]?.pointsPerGame ?? "-"}
+                      </TableCell>
+                      <TableCell>
+                        {user.stats[0]?.assistsPerGame ?? "-"}
+                      </TableCell>
+                      <TableCell>
+                        {user.stats[0]?.reboundsPerGame ?? "-"}
+                      </TableCell>
+                      <TableCell>
+                        {user.stats[0]?.turnoversPerGame ?? "-"}
+                      </TableCell>
+                      <TableCell>
+                        {user.stats[0]?.stealsPerGame ?? "-"}
+                      </TableCell>
+                      <TableCell>
+                        {user.stats[0]?.blocksPerGame ?? "-"}
+                      </TableCell>
+                      <TableCell>
+                        {user.stats[0]?.foulsPerGame ?? "-"}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+              </TableBody>
+            </Table>
 
-          {/* <ScrollBar orientation="vertical" /> */}
-          <ScrollBar orientation="horizontal" />
-        </ScrollArea>
+            {/* <ScrollBar orientation="vertical" /> */}
+            <ScrollBar orientation="horizontal" />
+          </ScrollArea>
+        </>
       )}
     </main>
   );

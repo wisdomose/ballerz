@@ -12,6 +12,7 @@ import { ROLES } from "@/types";
 import MyTeam from "./_MyTeam";
 import { useUserStore } from "@/store/user";
 import MyStat from "./_MyStat";
+import Stat from "./_Stat";
 
 export default function FeedPage() {
   const user = useUserStore((s) => s.user);
@@ -63,14 +64,21 @@ export default function FeedPage() {
                 </div>
               </div>
             </>
-          ) : (
+          ) : user?.role === ROLES.COACH ? (
             <>
               <div className="pl-3 mb-4 pr-6 pt-3">
                 <p className="text-xs uppercase font-medium">My team</p>
               </div>
               <MyTeam />
             </>
-          )}
+          ) : user?.role === ROLES.ADMIN ? (
+            <div className="pl-3 pr-6 pt-3">
+              <div className="mb-4">
+                <p className="text-xs uppercase font-medium">Site overview</p>
+              </div>
+              <Stat />
+            </div>
+          ) : null}
         </div>
       </main>
     </main>

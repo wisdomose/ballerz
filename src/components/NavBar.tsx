@@ -42,13 +42,21 @@ export default function NavBar() {
         <Button asChild variant={"link"}>
           <Link href="/events">Events</Link>
         </Button>
-        <Button asChild>
-          {user?.role === ROLES["COACH"] ? (
+        {user?.role === ROLES["COACH"] ? (
+          <Button asChild>
             <Link href="/team">My team</Link>
-          ) : (
+          </Button>
+        ) : user?.role === ROLES.PLAYER ? (
+          <Button asChild>
             <Link href={`/${user?.id}`}>My Stats</Link>
-          )}
-        </Button>
+          </Button>
+        ) : null}
+        {user?.role === ROLES.ADMIN && (
+          <>
+            <Link href="/admin/players">Players</Link>
+            <Link href="/admin/teams">Teams</Link>
+          </>
+        )}
         <Popover>
           <PopoverTrigger>
             <Avatar>
@@ -56,7 +64,7 @@ export default function NavBar() {
               <AvatarFallback>
                 {" "}
                 {(user?.displayName.split(" ")[0][0] ?? "").toUpperCase()}
-                {(user?.displayName.split(" ")[1][0] ?? "").toUpperCase()}
+                {(user?.displayName.split(" ")[1] ?? ""[0] ?? "").toUpperCase()}
               </AvatarFallback>
             </Avatar>
           </PopoverTrigger>

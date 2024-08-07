@@ -4,6 +4,8 @@ import { getApp } from "firebase/app";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import {
   collection,
+  deleteDoc,
+  doc,
   getDoc,
   getDocs,
   getFirestore,
@@ -30,6 +32,7 @@ export default class UserService {
     this.login = this.login.bind(this);
     this.profile = this.profile.bind(this);
     this.signUp = this.signUp.bind(this);
+    this.deleteOne = this.deleteOne.bind(this);
   }
 
   async login({ email, password }: { email: string; password: string }) {
@@ -110,6 +113,28 @@ export default class UserService {
 
           resolve(profile as unknown as User);
         }
+      } catch (error: any) {
+        reject(error.message);
+      }
+    });
+  }
+
+  async deleteOne(id: string) {
+    return new Promise<boolean>(async (resolve, reject) => {
+      try {
+        if (!this.auth.currentUser) throw new Error("You need to be logged in");
+
+        const userRef = doc(this.db, COLLECTIONS.USERS, id);
+
+        await axios({
+          url: `/api/delete-user`,
+          method: "DELETE",
+          data: { id },
+        });
+
+        await deleteDoc(userRef);
+
+        resolve(true);
       } catch (error: any) {
         reject(error.message);
       }

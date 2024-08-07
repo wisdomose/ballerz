@@ -1,9 +1,10 @@
-import { COLLECTIONS, Player, Stats } from "@/types";
+import { COLLECTIONS, Player, ROLES, Stats } from "@/types";
 import { getApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import {
   collection,
   doc,
+  getCountFromServer,
   getDocs,
   getFirestore,
   query,
@@ -29,6 +30,7 @@ export default class TeamService {
 
     this.team = this.team.bind(this);
     this.overview = this.overview.bind(this);
+    this.count = this.count.bind(this);
   }
 
   async team() {
@@ -96,6 +98,22 @@ export default class TeamService {
 
         const result = await Promise.all(promises);
         resolve(result.filter((entry) => entry !== null));
+      } catch (error: any) {
+        reject(error?.response?.data ?? error.message);
+      }
+    });
+  }
+
+  async count() {
+    return new Promise<number>(async (resolve, reject) => {
+      try {
+        if (!this.auth.currentUser) throw new Error("You need to be logged in");
+
+        const playerCol = collection(this.db, COLLECTIONS.USERS);
+        let q = query(playerCol, where("role", "==", ROLES.COACH));
+        const querySnapshot = await getCountFromServer(q);
+
+        resolve(querySnapshot.data().count);
       } catch (error: any) {
         reject(error?.response?.data ?? error.message);
       }

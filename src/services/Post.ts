@@ -4,6 +4,7 @@ import { getAuth } from "firebase/auth";
 import {
   addDoc,
   collection,
+  deleteDoc,
   doc,
   getDoc,
   getDocs,
@@ -28,6 +29,7 @@ export default class PostService {
 
     this.create = this.create.bind(this);
     this.findAll = this.findAll.bind(this);
+    this.deleteOne = this.deleteOne.bind(this);
   }
 
   async create(params: Pick<Post, "post"> & { file?: File }) {
@@ -113,6 +115,22 @@ export default class PostService {
         resolve(posts.filter((posts) => posts !== null));
       } catch (error: any) {
         reject(error?.response?.data ?? error.message);
+      }
+    });
+  }
+
+  async deleteOne(id: string) {
+    return new Promise<boolean>(async (resolve, reject) => {
+      try {
+        if (!this.auth.currentUser) throw new Error("You need to be logged in");
+
+        const userRef = doc(this.db, COLLECTIONS.POSTS, id);
+
+        await deleteDoc(userRef);
+
+        resolve(true);
+      } catch (error: any) {
+        reject(error.message);
       }
     });
   }

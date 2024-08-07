@@ -10,6 +10,7 @@ export type Address = {
 export enum ROLES {
   PLAYER = "PLAYER",
   COACH = "COACH",
+  ADMIN = "ADMIN",
 }
 export enum LEVEL {
   BEGINNER = "BEGINNER",

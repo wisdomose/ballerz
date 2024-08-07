@@ -5,7 +5,9 @@ import { getAuth } from "firebase/auth";
 import {
   addDoc,
   collection,
+  deleteDoc,
   doc,
+  getCountFromServer,
   getDoc,
   getDocs,
   getFirestore,
@@ -31,6 +33,8 @@ export default class EventService {
     this.create = this.create.bind(this);
     this.findAll = this.findAll.bind(this);
     this.findOne = this.findOne.bind(this);
+    this.count = this.count.bind(this);
+    this.deleteOne = this.deleteOne.bind(this);
   }
 
   async create(params: Pick<Event, "name" | "startingAt">) {
@@ -141,6 +145,39 @@ export default class EventService {
       } catch (error: any) {
         console.log(error);
         reject(error?.response?.data ?? error.message);
+      }
+    });
+  }
+  async count() {
+    return new Promise<number>(async (resolve, reject) => {
+      try {
+        if (!this.auth.currentUser) throw new Error("You need to be logged in");
+
+        const col = collection(this.db, COLLECTIONS.EVENTS);
+        let q = query(
+          col,
+          where("startingAt", ">=", Timestamp.fromDate(new Date()))
+        );
+        const querySnapshot = await getCountFromServer(q);
+
+        resolve(querySnapshot.data().count);
+      } catch (error: any) {
+        reject(error?.response?.data ?? error.message);
+      }
+    });
+  }
+  async deleteOne(id: string) {
+    return new Promise<boolean>(async (resolve, reject) => {
+      try {
+        if (!this.auth.currentUser) throw new Error("You need to be logged in");
+
+        const userRef = doc(this.db, COLLECTIONS.EVENTS, id);
+
+        await deleteDoc(userRef);
+
+        resolve(true);
+      } catch (error: any) {
+        reject(error.message);
       }
     });
   }

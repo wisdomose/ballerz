@@ -19,6 +19,7 @@ import PostService from "@/services/Post";
 import { useEffect, useRef } from "react";
 import { toast } from "react-toastify";
 import { useUserStore } from "@/store/user";
+import { ROLES } from "@/types";
 
 const MAX_SIZE = 2000000;
 const formSchema = z.object({
@@ -64,6 +65,8 @@ export default function CreatePost() {
     if (error) toast.error(error);
   }, [error]);
 
+  if (!user || user.role === ROLES["ADMIN"]) return null;
+
   return (
     <Form {...form}>
       <form
@@ -75,7 +78,7 @@ export default function CreatePost() {
             <AvatarImage src={user?.photoURL} />
             <AvatarFallback>
               {(user?.displayName.split(" ")[0][0] ?? "").toUpperCase()}
-              {(user?.displayName.split(" ")[1][0] ?? "").toUpperCase()}
+              {(user?.displayName.split(" ")[1] ?? ""[0] ?? "").toUpperCase()}
             </AvatarFallback>
           </Avatar>
           <div className="w-full">

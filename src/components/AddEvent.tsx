@@ -34,6 +34,8 @@ import { FiCalendar, FiPlus } from "react-icons/fi";
 import moment from "moment";
 import { cn } from "@/lib/utils";
 import EventService from "@/services/Event";
+import { ROLES } from "@/types";
+import { useUserStore } from "@/store/user";
 
 const formSchema = z.object({
   name: z
@@ -46,7 +48,7 @@ const formSchema = z.object({
 
 export default function AddEvent() {
   const { wrapper, data, loading, error } = useFetcher(null);
-  //   const { setUser } = useUserStore((state) => state);
+    const user = useUserStore((state) => state.user);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -75,6 +77,8 @@ export default function AddEvent() {
   useEffect(() => {
     if (error) toast.error(error);
   }, [error]);
+
+  if (!user || user.role === ROLES["ADMIN"]) return null;
 
   return (
     <Dialog>
